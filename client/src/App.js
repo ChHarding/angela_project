@@ -4,11 +4,20 @@ import axios from 'axios';
 function App() {
   const [ingredients, setIngredients] = useState('');
   const [recipes, setRecipes] = useState([]);
+  const [cuisine, setCuisine] = useState(''); 
+
+  const cuisineOptions = [
+        "African", "American", "British", "Cajun", "Caribbean", "Chinese",
+        "Eastern European", "European", "French", "German", "Greek", "Indian",
+        "Irish", "Italian", "Japanese", "Jewish", "Korean", "Latin American",
+        "Mediterranean", "Mexican", "Middle Eastern", "Nordic", "Southern",
+        "Spanish", "Thai", "Vietnamese"
+    ]
 
   const handleSearch = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5001/api/recipes?ingredients=${ingredients}`
+        `http://localhost:5001/api/recipes?ingredients=${ingredients}&cuisine=${cuisine}`
       );
       setRecipes(response.data);
     } catch (err) {
@@ -26,6 +35,16 @@ function App() {
         onChange={e => setIngredients(e.target.value)}
         placeholder="Enter ingredients, comma-separated"
       />
+
+      <select value={cuisine} onChange={e => setCuisine(e.target.value)}>
+        <option value="">Any cuisine</option>
+        {cuisineOptions.map((c, index) => (
+        <option key={index} value={c}>{c}</option>
+        ))}
+      </select>
+
+
+
       <button onClick={handleSearch}>Search</button>
 
       <ul>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import RecipeCard from "./components/RecipeCard";
+
 
 function App() {
   const [ingredients, setIngredients] = useState('');
@@ -47,29 +49,15 @@ function App() {
 
       <button onClick={handleSearch}>Search</button>
 
-      <ul>
-        {recipes.map(recipe => (
-          <li key={recipe.id}>
-            <h3>{recipe.title}</h3>
-            <img src={recipe.image} alt={recipe.title} width={100} />
-
-            <p><strong>Used Ingredients:</strong></p>
-      <ul>
-        {recipe.usedIngredients?.map(ing => (
-          <li key={ing.id}>{ing.name}</li>
-        ))}
-      </ul>
-
-      <p><strong>Missing Ingredients:</strong></p>
-      <ul>
-        {recipe.missedIngredients?.map(ing => (
-          <li key={ing.id}>{ing.name}</li>
-        ))}
-      </ul>
-      
-          </li>
-        ))}
-      </ul>
+      <div className="recipe-container">
+  {recipes.length > 0 ? (
+    recipes.map((recipe) => (
+      <RecipeCard key={recipe.id} recipe={recipe} />
+    ))
+  ) : (
+    <p>No recipes yet. Try searching above!</p>
+  )}
+</div>
     </div>
   );
 }

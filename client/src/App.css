@@ -264,3 +264,15 @@ h1 {
   color: #3A2F2A;
   list-style: disc;
 }
+
+/* RECIPE NUMBER SELECTOR */
+.count-input {
+  padding: 10px 12px;
+  width: 70px;
+  border: 1px solid #c9b89f;
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #FFF9F0;
+  color: #3A2F2A;
+}
+

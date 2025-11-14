@@ -5,10 +5,13 @@ import "./App.css";
 
 
 
+
 function App() {
   const [ingredients, setIngredients] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [cuisine, setCuisine] = useState('');
+  const [recipeCount, setRecipeCount] = useState(3);
+
 
   const cuisineOptions = [
     "African", "American", "British", "Cajun", "Caribbean", "Chinese",
@@ -21,7 +24,7 @@ function App() {
   const handleSearch = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5001/api/recipes?ingredients=${ingredients}&cuisine=${cuisine}`
+        `http://localhost:5001/api/recipes?ingredients=${ingredients}&cuisine=${cuisine}&number=${recipeCount}`
       );
       setRecipes(response.data);
     } catch (err) {
@@ -111,8 +114,20 @@ function App() {
             <option key={index} value={c}>{c}</option>
           ))}
         </select>
+
+        <input
+          type="number"
+          min="3"
+          max="12"
+          step="1"
+          value={recipeCount}
+          onChange={(e) => setRecipeCount(e.target.value)}
+          className="count-input"
+        />
+        
         <button onClick={handleSearch}>Search</button>
       </div>
+
 
       <div className="recipe-container">
         {recipes.length > 0 ? (

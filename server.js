@@ -8,6 +8,23 @@ app.use(cors());
 
 const PORT = process.env.PORT || 5001;
 
+// Removes long descriptions from ingredient list 
+/*
+function cleanIngredients(list) {
+    return list
+        .map(i => i.name.toLowerCase().trim())
+        .filter(name =>
+            name.length < 30 &&
+            !name.includes("decorate") &&
+            !name.includes("extra") &&
+            !name.includes("punnet") &&
+            !name.includes("worth") &&
+            !name.includes("package") &&
+            /^[a-z\s]+$/.test(name)
+        );
+}
+*/
+
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
@@ -66,6 +83,16 @@ app.get('/api/recipes', async (req, res) => {
 
         // Sort recipes so matching cuisine are listed first
         recipes.sort((a, b) => (b.matchesCuisine === true) - (a.matchesCuisine === true));
+
+        /* Remove duplicates by recipe title
+        const seen = new Set();
+        recipes = recipes.filter(recipe => {
+            const title = recipe.title.toLowerCase().trim();
+            if (seen.has(title)) return false;
+            seen.add(title);
+            return true;
+        });
+        */
 
         // Return only the top N requested
         recipes = recipes.slice(0, number);

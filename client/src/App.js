@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import RecipeCard from "./components/RecipeCard";
+import "./App.css";
+
+
+
 
 function App() {
   const [ingredients, setIngredients] = useState('');
   const [recipes, setRecipes] = useState([]);
+  const [cuisine, setCuisine] = useState('');
+  const [recipeCount, setRecipeCount] = useState(3);
+
+
+  const cuisineOptions = [
+    "African", "American", "British", "Cajun", "Caribbean", "Chinese",
+    "Eastern European", "European", "French", "German", "Greek", "Indian",
+    "Irish", "Italian", "Japanese", "Jewish", "Korean", "Latin American",
+    "Mediterranean", "Mexican", "Middle Eastern", "Nordic", "Southern",
+    "Spanish", "Thai", "Vietnamese"
+  ]
 
   const handleSearch = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5001/api/recipes?ingredients=${ingredients}`
+        `http://localhost:5001/api/recipes?ingredients=${ingredients}&cuisine=${cuisine}&number=${recipeCount}`
       );
       setRecipes(response.data);
     } catch (err) {
@@ -16,41 +32,112 @@ function App() {
     }
   };
 
+  /* TEMPORARY HARD CODE TO TEST CSS */
+
+  useEffect(() => {
+    const defaultRecipes = [
+      {
+        id: 1,
+        title: "Creamy Garlic Tomato Pasta",
+        image: "img/pasta.jpg",
+        cuisines: ["Italian"],
+        readyInMinutes: 25,
+        usedIngredients: [
+          { id: 11, name: "tomato" },
+          { id: 12, name: "garlic" },
+          { id: 13, name: "pasta" },
+        ],
+        missedIngredients: [
+          { id: 14, name: "basil" },
+          { id: 15, name: "parmesan" },
+        ],
+        sourceUrl: "#",
+      },
+      {
+        id: 2,
+        title: "Garlic Chicken Stir-Fry with Veggies",
+        image: "img/fry.jpg",
+        cuisines: ["Asian"],
+        readyInMinutes: 20,
+        usedIngredients: [
+          { id: 21, name: "chicken" },
+          { id: 22, name: "garlic" },
+          { id: 23, name: "soy sauce" },
+        ],
+        missedIngredients: [
+          { id: 24, name: "broccoli" },
+          { id: 25, name: "green onions" },
+        ],
+        sourceUrl: "#",
+      },
+      {
+        id: 3,
+        title: "Cheesy Veggie Tacos with Avocado",
+        image: "img/tacos.jpg",
+        cuisines: ["Mexican"],
+        readyInMinutes: 15,
+        usedIngredients: [
+          { id: 31, name: "beans" },
+          { id: 32, name: "cheese" },
+          { id: 33, name: "tortillas" },
+        ],
+        missedIngredients: [
+          { id: 34, name: "avocado" },
+          { id: 35, name: "lettuce" },
+        ],
+        sourceUrl: "#",
+      },
+    ];
+
+
+
+
+    setRecipes(defaultRecipes);
+  }, []);
+
+  /* TEMPORARY HARD CODE TO TEST CSS */
+
   return (
     <div>
       <h1>Leftover Recipe Finder</h1>
+      <div className="search-bar">
+        <input
+          type="text"
+          value={ingredients}
+          onChange={e => setIngredients(e.target.value)}
+          placeholder="Enter ingredients, comma-separated"
+        />
 
-      <input
-        type="text"
-        value={ingredients}
-        onChange={e => setIngredients(e.target.value)}
-        placeholder="Enter ingredients, comma-separated"
-      />
-      <button onClick={handleSearch}>Search</button>
+        <select value={cuisine} onChange={e => setCuisine(e.target.value)}>
+          <option value="">Any cuisine</option>
+          {cuisineOptions.map((c, index) => (
+            <option key={index} value={c}>{c}</option>
+          ))}
+        </select>
 
-      <ul>
-        {recipes.map(recipe => (
-          <li key={recipe.id}>
-            <h3>{recipe.title}</h3>
-            <img src={recipe.image} alt={recipe.title} width={100} />
+        <input
+          type="number"
+          min="3"
+          max="12"
+          step="1"
+          value={recipeCount}
+          onChange={(e) => setRecipeCount(e.target.value)}
+          className="count-input"
+        />
+        
+        <button onClick={handleSearch}>Search</button>
+      </div>
 
-            <p><strong>Used Ingredients:</strong></p>
-      <ul>
-        {recipe.usedIngredients?.map(ing => (
-          <li key={ing.id}>{ing.name}</li>
-        ))}
-      </ul>
 
-      <p><strong>Missing Ingredients:</strong></p>
-      <ul>
-        {recipe.missedIngredients?.map(ing => (
-          <li key={ing.id}>{ing.name}</li>
-        ))}
-      </ul>
-      
-          </li>
-        ))}
-      </ul>
+      <div className="recipe-container">
+        {recipes.length > 0 ? (
+          recipes.map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} />
+          ))
+        ) : (
+          <p>No recipes yet. Try searching above!</p>
+        )}
+      </div>
     </div>
   );
 }

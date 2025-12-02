@@ -171,7 +171,29 @@ app.get('/api/substitutions', async (req, res) => {
         basil: ["oregano", "thyme", "spinach"],
         broccoli: ["cauliflower", "brussels sprouts", "asparagus"],
         garlic: ["shallots", "garlic powder", "chives"],
-        chicken: ["tofu", "jackfruit"]
+        chicken: ["tofu", "jackfruit"],
+        tomato: ["canned tomatoes", "tomato sauce", "tomato paste + water"],
+        onion: ["shallots", "leeks", "onion powder"],
+        potato: ["sweet potato", "cauliflower", "turnips"],
+        carrot: ["sweet potato", "butternut squash", "parsnips"],
+        bell_pepper: ["poblano", "zucchini", "carrot"],
+        spinach: ["kale", "arugula", "chard"],
+        lemon: ["lime", "vinegar + a pinch of sugar"],
+        lime: ["lemon", "white vinegar"],
+        rice: ["quinoa", "cauliflower rice"],
+        pasta: ["zoodles", "rice noodles", "quinoa"],
+        ground_beef: ["turkey", "chicken", "lentils"],
+        beef: ["mushrooms", "jackfruit", "seitan"],
+        fish: ["tofu", "tempeh", "chickpeas"],
+        soy_sauce: ["tamari", "coconut aminos", "Worcestershire"],
+        vinegar: ["lemon juice", "lime juice"],
+        oil: ["butter", "ghee", "coconut oil"],
+        honey: ["maple syrup", "agave"],
+        vanilla: ["almond extract", "maple syrup"],
+        breadcrumbs: ["crushed crackers", "rolled oats", "panko"],
+        cornstarch: ["flour", "arrowroot powder", "potato starch"],
+        baking_powder: ["baking soda + cream of tartar"],
+        baking_soda: ["baking powder (use 3x amount)"]
     };
 
     try {

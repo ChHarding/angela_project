@@ -32,7 +32,7 @@ function RecipesPage() {
     }
   };
 
-  /* TEMPORARY HARD CODE TO TEST CSS */
+  /*
 
   useEffect(() => {
     const defaultRecipes = [
@@ -95,7 +95,7 @@ function RecipesPage() {
     setRecipes(defaultRecipes);
   }, []);
 
-  /* TEMPORARY HARD CODE TO TEST CSS */
+   */
 
   return (
     <div>

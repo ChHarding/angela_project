@@ -40,66 +40,50 @@ app.get('/api/recipes', async (req, res) => {
     const number = parseInt(req.query.number) || 3;
     const cuisine = req.query.cuisine ? req.query.cuisine.split(',').map(c => c.toLowerCase()) : [];
     const apiKey = process.env.API_KEY;
-    const cacheKey = `${ingredients}|${number}|${cuisine.join(",")}`;
+
+    /* Normalizes ingredient names by removing symbols and collapsing spaces */
+    function normalizeIngredient(name) {
+        return name
+            .toLowerCase()
+            .replace(/[^a-z\s]/g, "")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
+
+    /* Basic Ingredients */
+    const pantry = ["salt", "pepper", "oil", "water"];
+
+    const cleanIngredients = ingredients
+        .split(",")
+        .map(normalizeIngredient)
+        .filter(Boolean);
+
+    // Remove duplicates from cleaned input
+    const ingSet = [...new Set(cleanIngredients)];
+
+    // Add pantry staples + dedupe again
+    const finalIngredients = [...new Set([...ingSet, ...pantry])].join(",");
+
+    const cacheKey = `${finalIngredients}|${number}|${cuisine.join(",")}`;
 
     if (recipeCache[cacheKey]) {
     console.log("Using cached recipes:", cacheKey);
     return res.json(recipeCache[cacheKey]);
 }
 
-    if (!ingredients) return res.status(400).json({ error: 'Please provide ingredients' });
+    if (!finalIngredients) return res.status(400).json({ error: 'Please provide ingredients' });
 
     try {
-        // Fetch recipes by ingredients
-        /*
-        const response = await axios.get(
-            'https://api.spoonacular.com/recipes/findByIngredients',
-            {
-                params: {
-                    ingredients: ingredients,
-                    number,
-                    ranking: 1,
-                    ignorePantry: true,
-                    apiKey
-                }
-            }
-        );
-
-        const originalMap = {};
-        response.data.forEach(r => { originalMap[r.id] = r; });
-
-        // Fetch recipe details in parallel
-        const detailPromises = response.data.map(recipe =>
-            axios.get(`https://api.spoonacular.com/recipes/${recipe.id}/information`, { params: { apiKey } })
-        );
-        const details = await Promise.all(detailPromises);
-
-        // Combine used/missed ingredients and mark cuisine matches
-        let recipes = details.map(detail => {
-            const info = detail.data;
-            const original = originalMap[info.id];
-            const matchesCuisine = cuisine.length
-                ? info.cuisines.some(c => cuisine.includes(c.toLowerCase()))
-                : true;
-
-            return {
-                ...info,
-                usedIngredients: original?.usedIngredients || [],
-                missedIngredients: original?.missedIngredients || [],
-                matchesCuisine
-            };
-        });
-        */
         // Reduces API calls
         const response = await axios.get(
             'https://api.spoonacular.com/recipes/findByIngredients',
             {
                 params: {
-                    ingredients,
+                    ingredients: finalIngredients,
                     number,
                     ranking: 1,
                     ignorePantry: true,
-                    metaInformation: true,   // ⭐ important
+                    metaInformation: true,  
                     apiKey
                 }
             }
@@ -123,8 +107,19 @@ app.get('/api/recipes', async (req, res) => {
         }));
 
 
-        // Sort recipes so matching cuisine are listed first
-        recipes.sort((a, b) => (b.matchesCuisine === true) - (a.matchesCuisine === true));
+        // Sort recipes based on percent match of used ingredients
+        recipes.sort((a, b) => {
+            const scoreA = a.usedIngredients.length - a.missedIngredients.length;
+            const scoreB = b.usedIngredients.length - b.missedIngredients.length;
+            
+            // If score is tied, fallback to cuisine preference
+            if (scoreB === scoreA) {
+                return (b.matchesCuisine === true) - (a.matchesCuisine === true);
+            }
+            
+            return scoreB - scoreA;
+        });
+
 
         /* Remove duplicates by recipe title
         const seen = new Set();
@@ -171,7 +166,29 @@ app.get('/api/substitutions', async (req, res) => {
         basil: ["oregano", "thyme", "spinach"],
         broccoli: ["cauliflower", "brussels sprouts", "asparagus"],
         garlic: ["shallots", "garlic powder", "chives"],
-        chicken: ["tofu", "jackfruit"]
+        chicken: ["tofu", "jackfruit"],
+        tomato: ["canned tomatoes", "tomato sauce", "tomato paste + water"],
+        onion: ["shallots", "leeks", "onion powder"],
+        potato: ["sweet potato", "cauliflower", "turnips"],
+        carrot: ["sweet potato", "butternut squash", "parsnips"],
+        bell_pepper: ["poblano", "zucchini", "carrot"],
+        spinach: ["kale", "arugula", "chard"],
+        lemon: ["lime", "vinegar + a pinch of sugar"],
+        lime: ["lemon", "white vinegar"],
+        rice: ["quinoa", "cauliflower rice"],
+        pasta: ["zoodles", "rice noodles", "quinoa"],
+        ground_beef: ["turkey", "chicken", "lentils"],
+        beef: ["mushrooms", "jackfruit", "seitan"],
+        fish: ["tofu", "tempeh", "chickpeas"],
+        soy_sauce: ["tamari", "coconut aminos", "Worcestershire"],
+        vinegar: ["lemon juice", "lime juice"],
+        oil: ["butter", "ghee", "coconut oil"],
+        honey: ["maple syrup", "agave"],
+        vanilla: ["almond extract", "maple syrup"],
+        breadcrumbs: ["crushed crackers", "rolled oats", "panko"],
+        cornstarch: ["flour", "arrowroot powder", "potato starch"],
+        baking_powder: ["baking soda + cream of tartar"],
+        baking_soda: ["baking powder (use 3x amount)"]
     };
 
     try {
